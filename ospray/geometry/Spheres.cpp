@@ -53,6 +53,7 @@ namespace ospray {
     colorData         = getParamData("color");
     colorOffset       = getParam1i("color_offset",0);
     colorStride       = getParam1i("color_stride",4*sizeof(float));
+    clipplane         = (Plane*)getParamObject("clipPlane", NULL);
 
     if (sphereData.ptr == NULL) {
       throw std::runtime_error("#ospray:geometry/spheres: no 'spheres' data "
@@ -96,7 +97,8 @@ namespace ospray {
                               numSpheres,bytesPerSphere,
                               radius,materialID,
                               offset_center,offset_radius,
-                              offset_materialID,offset_colorID);
+                              offset_materialID,offset_colorID,
+                              clipplane?clipplane->getIE():NULL);
   }
 
   OSP_REGISTER_GEOMETRY(Spheres,spheres);

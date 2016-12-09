@@ -1,0 +1,12 @@
+#pragma once
+
+#include "math/vec.ih"
+#include "Plane.ih"
+
+//! ispc-equivalent of ospray::ClipPlane
+struct ClipPlane
+{
+  Plane super; //!< inherit plane properties
+};
+
+void ClipPlane_Constructor(ClipPlane *uniform cpln, void *uniform cppEquivalent);

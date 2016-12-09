@@ -380,6 +380,20 @@ extern "C" OSPMaterial ospNewMaterial(OSPRenderer renderer, const char *type)
   return material;
 }
 
+/*! \brief create a new Plane of given type
+
+return 'NULL' if that type is not known */
+extern "C" OSPPlane ospNewPlane(const char *type) {
+    ASSERT_DEVICE();
+    // Assert2(renderer != NULL, "invalid renderer handle in ospNewMaterial");
+    Assert2(type != NULL, "invalid Plane type identifier in ospNewPlane");
+    LOG("ospNewPlane(" << type << ")");
+    OSPPlane plane = ospray::api::Device::current->newPlane(type);
+    if ((ospray::logLevel > 0) && (plane == NULL))
+        std::cerr << "#ospray: could not create Plane '" << type << "'" << std::endl;
+    return plane;
+}
+
 extern "C" OSPLight ospNewLight(OSPRenderer renderer, const char *type)
 {
   ASSERT_DEVICE();

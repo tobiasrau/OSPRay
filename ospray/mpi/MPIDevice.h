@@ -164,6 +164,9 @@ namespace ospray {
       /*! have given renderer create a new material */
       OSPMaterial newMaterial(OSPRenderer _renderer, const char *type) override;
 
+      /*! create a new plane */
+      OSPPlane newPlane(const char *type) override;
+
       /*! create a new camera object (out of list of registered cameras) */
       OSPCamera newCamera(const char *type) override;
 

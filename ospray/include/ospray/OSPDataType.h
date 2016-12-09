@@ -39,6 +39,7 @@ typedef enum {
   OSP_TRANSFER_FUNCTION,
   OSP_VOLUME,
   OSP_PIXEL_OP,
+  OSP_PLANE,
 
   //! Pointer to a C-style NULL-terminated character string.
   OSP_STRING,

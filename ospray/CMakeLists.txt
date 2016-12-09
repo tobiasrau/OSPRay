@@ -101,6 +101,11 @@ SET(OSPRAY_SOURCES
   common/tasking/TaskingTypeTraits.h
   common/tasking/TaskSys.cpp
 
+  plane/Plane.ispc
+  plane/Plane.cpp
+  plane/ClipPlane.ispc
+  plane/ClipPlane.cpp
+
   fb/FrameBuffer.ispc
   fb/FrameBuffer.cpp
   fb/LocalFB.ispc
@@ -252,6 +257,7 @@ OSPRAY_INSTALL_SDK_HEADERS(
   common/Ray.ih
   common/Texture.h
   common/Thread.h
+
   DESTINATION common
 )
 
@@ -261,6 +267,15 @@ OSPRAY_INSTALL_SDK_HEADERS(
   common/tasking/TaskingTypeTraits.h
   common/tasking/TaskSys.h
   DESTINATION common/tasking
+)
+
+OSPRAY_INSTALL_SDK_HEADERS(
+  plane/Plane.h
+  plane/Plane.ih
+  plane/ClipPlane.h
+  plane/ClipPlane.ih
+
+  DESTINATION plane
 )
 
 OSPRAY_INSTALL_SDK_HEADERS(

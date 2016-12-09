@@ -1,0 +1,17 @@
+#pragma once
+
+#include "../common/OSPCommon.ih"
+#include "math/vec.ih"
+
+/*! ISPC-side abstraction for a plane. */
+struct Plane {
+  //! pointer back to the C++-equivalent of this class
+  void *cppEquivalent;
+  uniform float dist;
+  uniform vec3f normal;
+  uniform vec4f color;
+};
+
+void Plane_Constructor(Plane *uniform plane,
+                       void *uniform cppEquivalent
+                      );

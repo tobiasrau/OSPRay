@@ -131,6 +131,9 @@ namespace ospray {
       /*! have given renderer create a new material */
       virtual OSPMaterial newMaterial(OSPRenderer _renderer, const char *type) = 0;
 
+      /*! create a new Plane */
+      virtual OSPPlane newPlane(const char *type) = 0;
+
       /*! create a new Texture2D object */
       virtual OSPTexture2D newTexture2D(const vec2i &size,
           const OSPTextureFormat, void *data, const uint32 flags) = 0;

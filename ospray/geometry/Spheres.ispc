@@ -20,6 +20,7 @@
 #include "common/Ray.ih"
 #include "common/Model.ih"
 #include "geometry/Geometry.ih"
+#include "plane/Plane.ih"
 // embree
 #include "embree2/rtcore.isph"
 #include "embree2/rtcore_scene.isph"
@@ -44,6 +45,8 @@ struct Spheres {
   
   int32 numSpheres;
   int32 bytesPerSphere;
+
+  uniform Plane *uniform clipplane;
 };
 
 typedef uniform float uniform_float;
@@ -136,7 +139,7 @@ void Spheres_intersect(uniform Spheres *uniform self,
   uniform vec3f center =
       *((uniform vec3f*uniform)(spherePtr+self->offset_center));
   const vec3f A = center - ray.org;
-
+  
   const float a = dot(ray.dir,ray.dir);
   const float b = 2.f*dot(ray.dir,A);
   const float c = dot(A,A)-radius*radius;
@@ -149,21 +152,52 @@ void Spheres_intersect(uniform Spheres *uniform self,
   const float t_in = (b - srad) *rcpf(2.f*a);
   const float t_out= (b + srad) *rcpf(2.f*a);
 
+
   bool hit = false;
+  float t = 0.f;
   if (t_in > ray.t0 && t_in < ray.t) {
     hit = true;
-    ray.t = t_in;
+    t = t_in;
   } else if (t_out > ray.t0 && t_out < ray.t) {
     hit = true;
-    ray.t = t_out;
+    t = t_out;
   }
+  vec3f Ng = ray.org + t*ray.dir - center;
+
+
+  vec3f sph_intersect = t * ray.dir + ray.org;
+  vec3f sph_intersect_in = t_in * ray.dir + ray.org;
+  vec3f sph_intersect_out = t_out * ray.dir + ray.org;
+  
+  // clip data
+  if (self->clipplane != NULL && hit) {
+    const vec3f normal_hat = normalize(self->clipplane->normal);
+	vec3f cpb = normal_hat * self->clipplane->dist;
+	const float t_pln = (self->clipplane->dist - dot(ray.org,normal_hat)) / dot(ray.dir,normal_hat);
+	vec3f pln_intersect = ray.org + t_pln * ray.dir;
+	const float pln_in_n_dir = dot(pln_intersect,normal_hat);
+	const float sph_in_n_dir = dot(sph_intersect,normal_hat);
+	const float dist_plane = dot (cpb, normal_hat);
+	const float dist_sph_pln = dot(normal_hat, center - cpb);
+	if (pln_in_n_dir > dot(sph_intersect_in,normal_hat) && pln_in_n_dir < dot(sph_intersect_out,normal_hat)) {
+	  //t = dot(pln_intersect,ray.org);
+	  t = t_pln;
+	  //Ng = ray.org + t*ray.dir - center;
+	  Ng = normal_hat;
+	} else if (pln_in_n_dir > sph_in_n_dir) {
+	  return;
+	} 
+  }
+
+
   if (hit) {
-    ray.primID = primID;
+    ray.t = t;
+	ray.primID = primID;
     ray.geomID = self->super.geomID;
     ray.instID = -1;
     // cannot easily be moved to postIntersect
     // we need hit in object space, in postIntersect it is in world-space
-    ray.Ng = ray.org + ray.t*ray.dir - center;
+	ray.Ng = Ng;
   }
 }
 
@@ -191,10 +225,12 @@ export void SpheresGeometry_set(void  *uniform _self,
                                 int    uniform offset_center,
                                 int    uniform offset_radius,
                                 int    uniform offset_materialID,
-                                int    uniform offset_colorID)
+                                int    uniform offset_colorID,
+								void  *uniform _clipplane)
 {
   uniform Spheres *uniform self = (uniform Spheres *uniform)_self;
   uniform Model *uniform model = (uniform Model *uniform)_model;
+  uniform Plane *uniform clipplane = (uniform Plane *uniform)_clipplane;
 
   uniform uint32 geomID = rtcNewUserGeometry(model->embreeSceneHandle,numSpheres);
   
@@ -214,6 +250,8 @@ export void SpheresGeometry_set(void  *uniform _self,
   self->offset_radius     = offset_radius;
   self->offset_materialID = offset_materialID;
   self->offset_colorID    = offset_colorID;
+
+  self->clipplane         = clipplane;
 
   rtcSetUserData(model->embreeSceneHandle,geomID,self);
   rtcSetBoundsFunction(model->embreeSceneHandle,geomID,

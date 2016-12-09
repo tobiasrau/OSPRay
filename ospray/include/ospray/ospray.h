@@ -181,6 +181,7 @@ namespace osp {
   struct Data             : public ManagedObject {};
   struct Geometry         : public ManagedObject {};
   struct Material         : public ManagedObject {};
+  struct Plane            : public ManagedObject {};
   struct Volume           : public ManagedObject {};
   struct TransferFunction : public ManagedObject {};
   struct Texture2D        : public ManagedObject {};
@@ -195,6 +196,7 @@ typedef osp::Model             *OSPModel;
 typedef osp::Data              *OSPData;
 typedef osp::Geometry          *OSPGeometry;
 typedef osp::Material          *OSPMaterial;
+typedef osp::Plane             *OSPPlane;
 typedef osp::Light             *OSPLight;
 typedef osp::Volume            *OSPVolume;
 typedef osp::TransferFunction  *OSPTransferFunction;
@@ -231,6 +233,7 @@ typedef struct _OSPManagedObject *OSPManagedObject,
   *OSPData,
   *OSPGeometry,
   *OSPMaterial,
+  *OSPPlane,
   *OSPLight,
   *OSPVolume,
   *OSPTransferFunction,
@@ -293,6 +296,9 @@ extern "C" {
 
   //! let given renderer create a new material of given type
   OSPRAY_INTERFACE OSPMaterial ospNewMaterial(OSPRenderer, const char *type);
+
+  //! create new Plane of a given type
+  OSPRAY_INTERFACE OSPPlane ospNewPlane(const char *type);
 
   //! let given renderer create a new light of given type
   OSPRAY_INTERFACE OSPLight ospNewLight(OSPRenderer, const char *type);

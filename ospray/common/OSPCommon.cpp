@@ -175,6 +175,7 @@ namespace ospray {
     case OSP_GEOMETRY:
     case OSP_LIGHT:
     case OSP_MATERIAL:
+    case OSP_PLANE:
     case OSP_MODEL:
     case OSP_RENDERER:
     case OSP_TEXTURE:

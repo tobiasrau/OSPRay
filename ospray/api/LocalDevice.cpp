@@ -24,6 +24,7 @@
 #include "transferFunction/TransferFunction.h"
 #include "render/LoadBalancer.h"
 #include "common/Material.h"
+#include "plane/Plane.h"
 #include "common/Library.h"
 #include "texture/Texture2D.h"
 #include "lights/Light.h"
@@ -407,7 +408,7 @@ namespace ospray {
     /*! create a new geometry object (out of list of registered geometrys) */
     OSPGeometry LocalDevice::newGeometry(const char *type)
     {
-      Assert(type != nullptr && "invalid render type identifier");
+      Assert(type != nullptr && "invalid geometry type identifier");
       Geometry *geometry = Geometry::createGeometry(type);
       if (!geometry) return nullptr;
       geometry->refInc();
@@ -441,6 +442,19 @@ namespace ospray {
       if (!material) return nullptr;
       material->refInc();
       return (OSPMaterial)material;
+    }
+
+    /*! create a new plane */
+    OSPPlane LocalDevice::newPlane(const char *type) {
+        Assert2(type != nullptr, "invalid plane type identifier");
+
+        // -------------------------------------------------------
+        // check if there's a loadable plane by that name
+        //
+        Plane *plane= Plane::createPlane(type);
+        if (!plane) return nullptr;
+        plane->refInc();
+        return (OSPPlane)plane;
     }
 
     /*! create a new camera object (out of list of registered cameras) */

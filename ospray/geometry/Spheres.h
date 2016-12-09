@@ -17,6 +17,7 @@
 #pragma once
 
 #include "Geometry.h"
+#include "plane/Plane.h"
 
 namespace ospray {
   /*! @{ \ingroup ospray_module_streamlines */
@@ -85,6 +86,8 @@ namespace ospray {
         color. color of sphere i will be read as 3 floats from
         'colorOffset+i*colorStride */
     size_t    colorOffset;
+
+    Plane *clipplane;
 
     Spheres();
     ~Spheres();
