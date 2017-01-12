@@ -70,10 +70,14 @@ static void Spheres_postIntersect(uniform Geometry *uniform geometry,
     } else {
       colorID = ray.primID;
     }
+	if (ray.primID == -42) {
+	dg.color = self->clipplane->color;
+	} else {
     uint32 colorAddr = self->color_offset+colorID*self->color_stride;
     dg.color = *((vec4f *)(self->color_data+colorAddr));
+	}
   }
-  
+
   if (flags & DG_MATERIALID) {
     if (self->offset_materialID >= 0) {
       const uniform int32 primsPerPage = (1024*1024*64);
@@ -165,25 +169,29 @@ void Spheres_intersect(uniform Spheres *uniform self,
   vec3f Ng = ray.org + t*ray.dir - center;
 
 
-  vec3f sph_intersect = t * ray.dir + ray.org;
-  vec3f sph_intersect_in = t_in * ray.dir + ray.org;
-  vec3f sph_intersect_out = t_out * ray.dir + ray.org;
+
   
   // clip data
   if (self->clipplane != NULL && hit) {
-    const vec3f normal_hat = normalize(self->clipplane->normal);
-	vec3f cpb = normal_hat * self->clipplane->dist;
+    vec3f sph_intersect = t * ray.dir + ray.org;
+    vec3f sph_intersect_in = t_in * ray.dir + ray.org;
+    vec3f sph_intersect_out = t_out * ray.dir + ray.org;
+    
+	const vec3f normal_hat = normalize(self->clipplane->normal);
+	
 	const float t_pln = (self->clipplane->dist - dot(ray.org,normal_hat)) / dot(ray.dir,normal_hat);
 	vec3f pln_intersect = ray.org + t_pln * ray.dir;
 	const float pln_in_n_dir = dot(pln_intersect,normal_hat);
 	const float sph_in_n_dir = dot(sph_intersect,normal_hat);
-	const float dist_plane = dot (cpb, normal_hat);
-	const float dist_sph_pln = dot(normal_hat, center - cpb);
+
+	//vec3f cpb = normal_hat * self->clipplane->dist;
+	//const float dist_plane = dot (cpb, normal_hat);
+	//const float dist_sph_pln = dot(normal_hat, center - cpb);
+	
 	if (pln_in_n_dir > dot(sph_intersect_in,normal_hat) && pln_in_n_dir < dot(sph_intersect_out,normal_hat)) {
-	  //t = dot(pln_intersect,ray.org);
 	  t = t_pln;
-	  //Ng = ray.org + t*ray.dir - center;
 	  Ng = normal_hat;
+	  ray.primID = -42; // <- Dirty Hack :)
 	} else if (pln_in_n_dir > sph_in_n_dir) {
 	  return;
 	} 
@@ -192,7 +200,7 @@ void Spheres_intersect(uniform Spheres *uniform self,
 
   if (hit) {
     ray.t = t;
-	ray.primID = primID;
+	if (ray.primID != -42) ray.primID = primID;
     ray.geomID = self->super.geomID;
     ray.instID = -1;
     // cannot easily be moved to postIntersect
