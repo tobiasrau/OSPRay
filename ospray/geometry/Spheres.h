@@ -94,8 +94,6 @@ namespace ospray {
 
     Plane *clipplane;
 
-    Spheres();
-    ~Spheres();
   };
   /*! @} */
 

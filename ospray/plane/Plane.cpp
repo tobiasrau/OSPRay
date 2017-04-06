@@ -27,7 +27,7 @@ namespace ospray {
         if (it != planeRegistry.end())
             return it->second ? (it->second)() : NULL;
 
-        if (ospray::logLevel >= 2)
+        if (ospray::logLevel() >= 2)
             std::cout << "#ospray: trying to look up plane type '"
             << type << "' for the first time..." << std::endl;
 
@@ -41,7 +41,7 @@ namespace ospray {
         // The named function may not be found if the requested subtype is not
         // known.
         if (creator == NULL) {
-            if (ospray::logLevel >= 1)
+            if (ospray::logLevel() >= 1)
                 std::cout << "#ospray: could not find plane type '" << type << "'" << std::endl;
             return NULL;
         }
