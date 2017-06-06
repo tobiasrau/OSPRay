@@ -58,7 +58,7 @@ namespace ospray {
     /*! it's up to the proper init routine to decide which processes
       call this function and which ones don't. This function will not
       return. */
-    OSPRAY_MPI_INTERFACE void runWorker();
+    void runWorker();
 
     // Misc helper functions //////////////////////////////////////////////////
 
@@ -437,7 +437,7 @@ namespace ospray {
 
       /* set up fabric and stuff - by now all the communicators should
          be properly set up */
-      mpiFabric   = make_unique<MPIBcastFabric>(mpi::worker);
+      mpiFabric   = make_unique<MPIBcastFabric>(mpi::worker, MPI_ROOT, 0);
       readStream  = make_unique<networking::BufferedReadStream>(*mpiFabric);
       writeStream = make_unique<networking::BufferedWriteStream>(*mpiFabric);
 
